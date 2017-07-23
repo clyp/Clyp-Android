@@ -30,9 +30,9 @@ public class QueueTrackAdapter extends ArrayAdapter<String> {
     public View getView(int position, View view, ViewGroup parent) {
         LayoutInflater inflater = context.getLayoutInflater();
         View rowView= inflater.inflate(R.layout.track_item, null, true);
-        TextView txtTitle = (TextView) rowView.findViewById(R.id.txt);
+        TextView txtTitle = (TextView) rowView.findViewById(R.id.track_title);
 
-        ImageView imageView = (ImageView) rowView.findViewById(R.id.img);
+        ImageView imageView = (ImageView) rowView.findViewById(R.id.track_discography);
         txtTitle.setText(web[position]);
 
         imageView.setImageResource(imageId[position]);

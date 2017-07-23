@@ -3,6 +3,7 @@ package it.clyp.clyp.Ui.ListEntity;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,15 +11,13 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageRequest;
-
+import java.util.HashMap;
 import java.util.List;
 
 import it.clyp.clyp.API.Structure.Track;
-import it.clyp.clyp.Activity.HomeActivity;
 import it.clyp.clyp.R;
+import it.clyp.clyp.Util.CachedIconloader;
+import it.clyp.clyp.Util.GraphicOperation;
 
 /**
  * Created by lite20 on 7/17/2017.
@@ -26,6 +25,8 @@ import it.clyp.clyp.R;
 
 public class HomeListAdapter extends ArrayAdapter<Track> {
     private List<Track> tracks;
+
+    private HashMap<String, Integer> urlToIdMap = new HashMap<String, Integer>();
 
     private Context context;
 
@@ -37,42 +38,65 @@ public class HomeListAdapter extends ArrayAdapter<Track> {
 
     /*private view holder class*/
     private class ViewHolder {
-        ImageView imageView;
-        TextView txtTitle;
+        ImageView trackDiscography;
+        TextView trackTitle;
+        TextView trackArtist;
     }
 
-    public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder = null;
-        Track track = getItem(position);
+    /**
+     * 
+     * @param listPosition
+     * @param listViewElement This is one singular l
+     * @param parent
+     * @return
+     */
+    public View getView(int listPosition, View listViewElement, ViewGroup parent) {
+        ViewHolder holder;
+        Track track = getItem(listPosition);
         LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-        if (convertView == null) {
-            convertView = mInflater.inflate(R.layout.track_item, null);
+        if (listViewElement == null) {
+            listViewElement = mInflater.inflate(R.layout.track_item, null);
             holder = new ViewHolder();
-            holder.txtTitle = (TextView) convertView.findViewById(R.id.txt);
-            holder.imageView = (ImageView) convertView.findViewById(R.id.img);
-            convertView.setTag(holder);
+            // fetch references to all elements
+            holder.trackTitle = (TextView) listViewElement.findViewById(R.id.track_title);
+            holder.trackArtist = (TextView) listViewElement.findViewById(R.id.track_artist);
+            holder.trackDiscography = (ImageView) listViewElement.findViewById(R.id.track_discography);
+            listViewElement.setTag(holder);
         } else {
-            holder = (ViewHolder) convertView.getTag();
+            holder = (ViewHolder) listViewElement.getTag();
         }
 
-        holder.txtTitle.setText(track.getTitle());
-        final View finalConvertView = convertView;
-        ImageRequest request = new ImageRequest(track.getArtworkPictureUrl(),
-                new Response.Listener<Bitmap>() {
+        /* set title to track's title */
+        holder.trackTitle.setText(track.getTitle());
+
+        /* set track artist */
+        // not all tracks are uploaded with an account so we only set the author if a user is tied to the track
+        if(track.getUser() != null) {
+            holder.trackArtist.setText(track.getName());
+        }
+
+        /* set track discography (artwork) */
+        // make a final fork of the convert view since we need this specific copy for getting the ui image element
+        final View finalConvertView = listViewElement;
+
+        // set a place holder image until loaded
+        holder.trackDiscography.setImageBitmap(
+                BitmapFactory.decodeResource(context.getResources(), R.drawable.blank)
+        );
+        // load the icon in the background and set it once it's available
+        CachedIconloader.setIcon(
+                track.getDiscographyUrl(),
+                listViewElement, R.id.track_discography,
+                new CachedIconloader.CILPostFetchCallback() {
                     @Override
-                    public void onResponse(Bitmap bitmap) {
-                        ImageView img = (ImageView)finalConvertView.findViewById(R.id.img);
-                        img.setImageBitmap(bitmap);
-                    }
-                }, 0, 0, null,
-                new Response.ErrorListener() {
-                    public void onErrorResponse(VolleyError error) {
-                        // mImageView.setImageResource(R.drawable.image_load_error);
+                    public Bitmap onComplete(Bitmap bmp) {
+                        return new GraphicOperation(bmp)
+                                .roundCorners(5)
+                                .result();
                     }
                 }
         );
 
-        HomeActivity.mRequestQueue.add(request);
-        return convertView;
+        return listViewElement;
     }
 }

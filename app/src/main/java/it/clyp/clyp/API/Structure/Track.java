@@ -20,7 +20,7 @@ public class Track {
     private String category;
     @SerializedName("User")
     @Expose
-    private User user;
+    public User user;
     @SerializedName("AudioFileId")
     @Expose
     private String audioFileId;
@@ -175,4 +175,39 @@ public class Track {
         this.dateCreated = dateCreated;
     }
 
+    public String getName() {
+        // not all tracks will have a user attached (uploaded without an account) so we check first
+        if(this.getUser() != null) {
+            String name = "";
+            // just in case there's no first name, we check for it
+            if(this.getUser().getFirstName() != null) {
+                name += this.getUser().getFirstName() + " ";
+            }
+
+            // not all users have last names so we check for a last name
+            if(this.getUser().getLastName() != null) {
+                name += this.getUser().getLastName();
+            }
+
+            // lastly we set the track artist name
+            return name;
+        } else {
+            return null;
+        }
+    }
+
+    public String getDiscographyUrl() {
+        // not all tracks are uploaded with discography (artwork) so we compensate with their profile picture
+        if (this.getArtworkPictureUrl() == null) {
+            // check if there's an attached user, and if not we use the default profile image
+            if (this.getUser() == null) {
+                // TODO use local copy of placeholder image
+                return "https://d2cjvbryygm0lr.cloudfront.net/default-profile-picture-2.png";
+            } else {
+                return this.getUser().getProfilePictureUrl();
+            }
+        } else {
+            return this.getArtworkPictureUrl();
+        }
+    }
 }

@@ -6,10 +6,10 @@ import it.clyp.clyp.API.Response.AuthResponse;
 import it.clyp.clyp.API.Response.CategoryResponse;
 import it.clyp.clyp.API.Structure.Playlist;
 import it.clyp.clyp.API.Structure.Track;
+import it.clyp.clyp.API.Structure.UploadsResponse;
 import it.clyp.clyp.API.Structure.User;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
@@ -33,8 +33,21 @@ public interface ClypApiInterface {
             @Field("password") String password
     );
 
+    @Headers({"Authorization: Basic MjkzMTE5Og==","Content-Type: application/x-www-form-urlencoded"})
+    @FormUrlEncoded
+    @POST("oauth2/token")
+    Call<AuthResponse> refreshToken(
+            @Field("grant_type") String grant_type,
+            @Field("refresh_token") String refresh_token
+    );
+
+    @GET("v2/me/uploads")
+    Call<UploadsResponse> getUploads(
+            @Header("Authorization") String auth_token
+    );
+
     @GET("me")
-    Callback<User> getSelf(
+    Call<User> getSelf(
             @Header("Authorization") String auth_token
     );
 

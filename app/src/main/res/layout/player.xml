@@ -20,20 +20,22 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
-            android:id="@+id/song_background"
+            android:id="@+id/player_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
             android:scaleType="centerCrop"
-            android:src="@drawable/exo_back" />
+            android:src="@drawable/exo_back"
+            app:srcCompat="@drawable/auth_background" />
 
         <android.support.constraint.ConstraintLayout
+            android:id="@+id/player_ui"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/song_discography"
+                android:id="@+id/player_discography"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -45,10 +47,11 @@
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/clyp_logo" />
+                app:layout_constraintTop_toBottomOf="@+id/clyp_logo"
+                app:srcCompat="@drawable/blank" />
 
             <ImageButton
-                android:id="@+id/search"
+                android:id="@+id/player_search"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -60,7 +63,7 @@
                 android:scaleX="1.5"
                 android:scaleY="1.5"
                 android:tint="@android:color/white"
-                app:layout_constraintBottom_toTopOf="@+id/song_discography"
+                app:layout_constraintBottom_toTopOf="@+id/player_discography"
                 app:layout_constraintHorizontal_bias="0.504"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toLeftOf="@+id/clyp_logo"
@@ -68,7 +71,7 @@
                 app:srcCompat="@drawable/ic_search_black_24dp" />
 
             <ImageButton
-                android:id="@+id/info"
+                android:id="@+id/player_info"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
@@ -81,7 +84,7 @@
                 android:scaleX="1.5"
                 android:scaleY="1.5"
                 android:tint="@android:color/white"
-                app:layout_constraintBottom_toTopOf="@+id/song_discography"
+                app:layout_constraintBottom_toTopOf="@+id/player_discography"
                 app:layout_constraintHorizontal_bias="0.467"
                 app:layout_constraintLeft_toRightOf="@+id/clyp_logo"
                 app:layout_constraintRight_toRightOf="parent"
@@ -103,34 +106,34 @@
                 app:srcCompat="@drawable/ic_clyp_logo_primary_98x44" />
 
             <TextView
-                android:id="@+id/song_title"
+                android:id="@+id/player_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Exosphere (ft. Paige..."
+                android:text="..."
                 android:textColor="@android:color/white"
                 android:textSize="24sp"
                 android:typeface="serif"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/song_discography" />
+                app:layout_constraintTop_toBottomOf="@+id/player_discography" />
 
             <TextView
-                android:id="@+id/song_author"
+                android:id="@+id/player_author"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="Döpplo McFish"
+                android:text="..."
                 android:textColor="@android:color/white"
                 android:textSize="18sp"
                 android:typeface="sans"
                 app:layout_constraintHorizontal_bias="0.498"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/song_title" />
+                app:layout_constraintTop_toBottomOf="@+id/player_title" />
 
             <ImageButton
-                android:id="@+id/play"
+                android:id="@+id/player_play"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
@@ -140,12 +143,12 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/song_author"
+                app:layout_constraintTop_toBottomOf="@+id/player_author"
                 app:layout_constraintVertical_bias="0.488"
                 app:srcCompat="@drawable/ic_play_circle_filled_black_24dp" />
 
             <ImageButton
-                android:id="@+id/next"
+                android:id="@+id/player_next"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
@@ -153,13 +156,13 @@
                 android:scaleY="2"
                 android:tint="@android:color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@+id/play"
-                app:layout_constraintRight_toLeftOf="@+id/queue"
-                app:layout_constraintTop_toBottomOf="@+id/song_author"
+                app:layout_constraintLeft_toRightOf="@+id/player_play"
+                app:layout_constraintRight_toLeftOf="@+id/player_queue"
+                app:layout_constraintTop_toBottomOf="@+id/player_author"
                 app:srcCompat="@drawable/ic_skip_next_black_24dp" />
 
             <ImageButton
-                android:id="@+id/previous"
+                android:id="@+id/player_previous"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@android:color/transparent"
@@ -167,13 +170,13 @@
                 android:scaleY="2"
                 android:tint="@android:color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toRightOf="@+id/repeat"
-                app:layout_constraintRight_toLeftOf="@+id/play"
-                app:layout_constraintTop_toBottomOf="@+id/song_author"
+                app:layout_constraintLeft_toRightOf="@+id/player_repeat"
+                app:layout_constraintRight_toLeftOf="@+id/player_play"
+                app:layout_constraintTop_toBottomOf="@+id/player_author"
                 app:srcCompat="@drawable/ic_skip_previous_black_24dp" />
 
             <ImageButton
-                android:id="@+id/repeat"
+                android:id="@+id/player_repeat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="40dp"
@@ -184,12 +187,12 @@
                 android:tint="@android:color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/song_author"
+                app:layout_constraintTop_toBottomOf="@+id/player_author"
                 app:layout_constraintVertical_bias="0.491"
                 app:srcCompat="@drawable/ic_repeat_black_24dp" />
 
             <ImageButton
-                android:id="@+id/queue"
+                android:id="@+id/player_queue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="40dp"
@@ -200,7 +203,7 @@
                 android:tint="@android:color/white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/song_author"
+                app:layout_constraintTop_toBottomOf="@+id/player_author"
                 app:layout_constraintVertical_bias="0.491"
                 app:srcCompat="@drawable/ic_shuffle_black_24dp" />
 

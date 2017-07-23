@@ -10,7 +10,6 @@ import com.google.gson.annotations.SerializedName;
 
 public class User {
 
-
     @SerializedName("FirstName")
     @Expose
     private String firstName;
@@ -47,6 +46,9 @@ public class User {
     @SerializedName("DefaultAudioFileStatus")
     @Expose
     private String defaultAudioFileStatus;
+    @SerializedName("Biography")
+    @Expose
+    private String biography;
     @SerializedName("NotificationsSummary")
     @Expose
     private NotificationsSummary notificationsSummary;
@@ -95,7 +97,7 @@ public class User {
     }
 
     public String getProfilePictureUrl() {
-        return profilePictureUrl;
+        return (profilePictureUrl != null) ? profilePictureUrl : "https://d2cjvbryygm0lr.cloudfront.net/default-profile-picture-2.png";
     }
 
     public void setProfilePictureUrl(String profilePictureUrl) {
@@ -164,5 +166,13 @@ public class User {
 
     public void setOutgoingUserRelationship(OutgoingUserRelationship outgoingUserRelationship) {
         this.outgoingUserRelationship = outgoingUserRelationship;
+    }
+
+    public String getBiography() {
+        return biography;
+    }
+
+    public void setBiography(String biography) {
+        this.biography = biography;
     }
 }

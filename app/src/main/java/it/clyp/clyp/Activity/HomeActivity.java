@@ -16,17 +16,22 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.BasicNetwork;
 import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.HurlStack;
+import com.crashlytics.android.Crashlytics;
+import com.google.firebase.analytics.FirebaseAnalytics;
 
 import java.io.File;
 
+import io.fabric.sdk.android.Fabric;
 import it.clyp.clyp.API.ClypApi;
 import it.clyp.clyp.Flags;
+import it.clyp.clyp.R;
 import it.clyp.clyp.Ui.Fragment.FeedFragment;
 import it.clyp.clyp.Ui.Fragment.HomeFragment;
 import it.clyp.clyp.Ui.Fragment.MeFragment;
-import it.clyp.clyp.R;
 
 public class HomeActivity extends AppCompatActivity {
+
+    private FirebaseAnalytics mFirebaseAnalytics;
 
     public static RequestQueue mRequestQueue;
 
@@ -36,12 +41,14 @@ public class HomeActivity extends AppCompatActivity {
 
     SharedPreferences settings;
 
-    public ClypApi api;
+    public static ClypApi api;
+
     private File cache;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_home);
         settings = getSharedPreferences(Flags.PREFS_SETTINGS, 0);
         if(!settings.getBoolean("firstInstall", false)) {
@@ -56,12 +63,15 @@ public class HomeActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if(settings.contains("auth_token") && settings.contains("expiry_time")) {
             String token = settings.getString("auth_token", null);
+            String refresh_token = settings.getString("refresh_token", null);
             int expiry = settings.getInt("expiry_time", 0);
-            api = new ClypApi(this, "https://api.clyp.it", token, expiry);
+            api = new ClypApi(this, "https://api.clyp.it", token, refresh_token, expiry);
+
         } else if(intent.getBooleanExtra(Flags.INTENT_IS_AUTHED, false)) {
             String token = intent.getStringExtra(Flags.INTENT_AUTH_TOKEN);
+            String refresh_token = settings.getString("refresh_token", null);
             int expiry = intent.getIntExtra(Flags.INTENT_AUTH_EXPIRY, 0);
-            api = new ClypApi(this, "https://api.clyp.it", token, expiry);
+            api = new ClypApi(this, "https://api.clyp.it", token, refresh_token, expiry);
             settings.edit()
                     .putString("auth_token", token)
                     .putInt("expiry_time", expiry)
@@ -83,6 +93,9 @@ public class HomeActivity extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+
+        // init firebase
+        mFirebaseAnalytics = FirebaseAnalytics.getInstance(this);
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {

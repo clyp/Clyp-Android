@@ -2,9 +2,11 @@ package it.clyp.clyp.API;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import it.clyp.clyp.API.Callback.AuthCallback;
@@ -12,7 +14,9 @@ import it.clyp.clyp.API.Callback.FeatureCallback;
 import it.clyp.clyp.API.Callback.StandardCallback;
 import it.clyp.clyp.API.Response.AuthResponse;
 import it.clyp.clyp.API.Structure.Track;
+import it.clyp.clyp.API.Structure.User;
 import it.clyp.clyp.Flags;
+import it.clyp.clyp.Util.CallbackBuilder;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -23,8 +27,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * Created by lite20 on 7/16/2017.
  */
 
-public class ClypApi {
+public class ClypApi implements Runnable, Callback<AuthResponse> {
     private final Context context;
+
+    private String refresh_token;
 
     public ClypApiInterface service;
 
@@ -32,8 +38,7 @@ public class ClypApi {
 
     private String token;
 
-    private int expiry;
-
+    private List<StandardCallback> pendingCalls = new ArrayList<>();
 
     public ClypApi(Context context, String base) {
         this.context = context;
@@ -49,7 +54,7 @@ public class ClypApi {
         service = retrofit.create(ClypApiInterface.class);
     }
 
-    public ClypApi(Context context, String base, String token, int expiry) {
+    public ClypApi(Context context, String base, String token, String refresh_token, int expiry) {
         this.context = context;
         Retrofit soundwaveRetrofit = new Retrofit.Builder()
                 .baseUrl("https://soundwave.clyp.it")
@@ -62,7 +67,17 @@ public class ClypApi {
                 .build();
         service = retrofit.create(ClypApiInterface.class);
         this.token = token;
-        this.expiry = expiry;
+        this.refresh_token = refresh_token;
+        new Handler().postDelayed(this, expiry * 1000);
+    }
+
+    public void refreshToken() {
+        Call<AuthResponse> call = service.refreshToken(
+                "refresh_token",
+                refresh_token
+        );
+
+        call.enqueue(this);
     }
 
     public void getSoundwave(String songId, final StandardCallback cb) {
@@ -94,6 +109,7 @@ public class ClypApi {
             @Override
             public void onFailure(Call<List<Integer>> call, Throwable t) {
                 // something went completely south (like no internet connection)
+                // TODO handle errors and display graphics to inform users
                 Log.d("ClypAPI", "FAILURE: " + t.getMessage());
                 cb.onComplete(t.getMessage(), null);
             }
@@ -104,7 +120,6 @@ public class ClypApi {
         Call<List<Track>> featuredCall = service.getFeaturedTracks();
         Call<List<Track>> trendingCall = service.getPopularTracks();
         Call<List<Track>> recentCall = service.getRecentTracks();
-
         featuredCall.enqueue(new Callback<List<Track>>() {
             @Override
             public void onResponse(Call<List<Track>> call, Response<List<Track>> response) {
@@ -228,6 +243,94 @@ public class ClypApi {
         });
     }
 
+    public void getUploads(final StandardCallback cb) {
+        Call<User> call = service.getSelf(
+                "Bearer " + token
+        );
+
+        Callback<User> callback = new Callback<User>() {
+            boolean tried = false;
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful()) {
+                    cb.onComplete(null, response.body());
+                } else {
+                    // error response, no access to resource?
+                    try {
+                        Log.d("ClypAPI", "ERROR: " + response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        if(response.message().contains("Unauthorized") && !tried) {
+                            tried = true;
+                            pendingCalls.add(CallbackBuilder.construct(call, this));
+                            refreshToken();
+                        } else {
+                            cb.onComplete(response.errorBody().string(), null);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                // something went completely south (like no internet connection)
+                Log.d("ClypAPI", "FAILURE: " + t.getMessage());
+                cb.onComplete(t.getMessage(), null);
+            }
+        };
+
+        call.enqueue(callback);
+    }
+
+    public void getSelf(final StandardCallback cb) {
+        Call<User> call = service.getSelf(
+                "Bearer " + token
+        );
+
+        Callback<User> callback = new Callback<User>() {
+            boolean tried = false;
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful()) {
+                    cb.onComplete(null, response.body());
+                } else {
+                    // error response, no access to resource?
+                    try {
+                        Log.d("ClypAPI", "ERROR: " + response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        if(response.message().contains("Unauthorized") && !tried) {
+                            tried = true;
+                            pendingCalls.add(CallbackBuilder.construct(call, this));
+                            refreshToken();
+                        } else {
+                            cb.onComplete(response.errorBody().string(), null);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                // something went completely south (like no internet connection)
+                Log.d("ClypAPI", "FAILURE: " + t.getMessage());
+                cb.onComplete(t.getMessage(), null);
+            }
+        };
+
+        call.enqueue(callback);
+    }
+
     public void getCategoryTracks(String category, final StandardCallback cb) {
         Call<List<Track>> call = service.getCategoryTrackList(
                 category
@@ -281,7 +384,7 @@ public class ClypApi {
             public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
                 if (response.isSuccessful()) {
                     token = response.body().getAccess_token();
-                    expiry = response.body().getExpires_in();
+                    refresh_token = response.body().getRefresh_token();
                     progress.dismiss();
                     authCallback.onAuthComplete(null, true);
                 } else {
@@ -293,7 +396,7 @@ public class ClypApi {
                     }
 
                     try {
-                        authCallback.onAuthComplete(response.errorBody().string(),false);
+                        authCallback.onAuthComplete(response.errorBody().string(), false);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -316,7 +419,39 @@ public class ClypApi {
         return token;
     }
 
-    public int getExpiry() {
-        return expiry;
+    /**
+     * We extend Runnable to simplify setting a timer to refresh tokens
+     */
+    @Override
+    public void run() {
+        this.refreshToken();
     }
+
+    /**
+     * We extend the Call class to simplify refreshing tokens
+     * @param call
+     * @param response
+     */
+    @Override
+    public void onResponse(Call<AuthResponse> call, Response<AuthResponse> response) {
+        if (response.isSuccessful()) {
+            token = response.body().getAccess_token();
+            refresh_token = response.body().getRefresh_token();
+            new Handler().postDelayed(this, response.body().getExpires_in() * 1000);
+            // issue all the calls that were pending on the refresh
+            for(int i = 0; i < pendingCalls.size(); i++) {
+                pendingCalls.get(i).onComplete(null, null);
+            }
+        } else {
+            // error response, no access to resource?
+            try {
+                Log.d("ClypAPI", "ERROR: " + response.errorBody().string());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public void onFailure(Call<AuthResponse> call, Throwable t) {}
 }

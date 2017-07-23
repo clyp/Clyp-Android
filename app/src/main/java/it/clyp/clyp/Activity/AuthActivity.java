@@ -46,7 +46,6 @@ public class AuthActivity extends AppCompatActivity {
                                         Intent intent = new Intent(context, HomeActivity.class);
                                         intent.putExtra(Flags.INTENT_IS_AUTHED, true);
                                         intent.putExtra(Flags.INTENT_AUTH_TOKEN, api.getToken());
-                                        intent.putExtra(Flags.INTENT_AUTH_EXPIRY, api.getExpiry());
                                         startActivity(intent);
                                     } else {
                                         Toast.makeText(context, error, Toast.LENGTH_SHORT);
