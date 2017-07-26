@@ -1,8 +1,10 @@
 package it.clyp.clyp.API.Structure;
 
 /**
- * Created by lite20 on 7/21/2017.
+ * Generated with: http://www.jsonschema2pojo.org/
+ * By lite20
  */
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 

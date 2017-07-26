@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import java.util.LinkedList;
@@ -100,7 +101,7 @@ public class HomeFragment extends Fragment {
                     case Flags.CALLBACK_FEATURE_FEATURE:
                         featureTracks.addAll(body);
                         featureAdapter.notifyDataSetChanged();
-                        PeriodicLabelSwitcher ftSwitcher = new PeriodicLabelSwitcher(
+                        final PeriodicLabelSwitcher ftSwitcher = new PeriodicLabelSwitcher(
                                 R.id.featured_showcase_discography,
                                 rootView.findViewById(R.id.featured_showcase),
                                 body,
@@ -108,12 +109,25 @@ public class HomeFragment extends Fragment {
                         );
 
                         ftSwitcher.start();
+                        ImageView featuredShowcase = (ImageView) rootView.findViewById(R.id.featured_showcase_discography);
+                        featuredShowcase.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(rootView.getContext(), PlayerActivity.class);
+                                intent.putExtra(Flags.INTENT_TRACK_ARTIST, ftSwitcher.getCurrentTrack().getName());
+                                intent.putExtra(Flags.INTENT_TRACK_TITLE, ftSwitcher.getCurrentTrack().getTitle());
+                                intent.putExtra(Flags.INTENT_TRACK_DISCOGRAPHY, ftSwitcher.getCurrentTrack().getDiscographyUrl());
+                                intent.putExtra(Flags.INTENT_TRACK_OGG, ftSwitcher.getCurrentTrack().getSecureOggUrl());
+                                startActivity(intent);
+                            }
+                        });
+
                         break;
 
                     case Flags.CALLBACK_FEATURE_TRENDING:
                         trendingTracks.addAll(body);
                         trendingAdapter.notifyDataSetChanged();
-                        PeriodicLabelSwitcher trndSwitcher = new PeriodicLabelSwitcher(
+                        final PeriodicLabelSwitcher trndSwitcher = new PeriodicLabelSwitcher(
                                 R.id.trending_showcase_discography,
                                 rootView.findViewById(R.id.trending_showcase),
                                 body,
@@ -121,12 +135,25 @@ public class HomeFragment extends Fragment {
                         );
 
                         trndSwitcher.start();
+                        ImageView trndShowcase = (ImageView) rootView.findViewById(R.id.trending_showcase_discography);
+                        trndShowcase.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(rootView.getContext(), PlayerActivity.class);
+                                intent.putExtra(Flags.INTENT_TRACK_ARTIST, trndSwitcher.getCurrentTrack().getName());
+                                intent.putExtra(Flags.INTENT_TRACK_TITLE, trndSwitcher.getCurrentTrack().getTitle());
+                                intent.putExtra(Flags.INTENT_TRACK_DISCOGRAPHY, trndSwitcher.getCurrentTrack().getDiscographyUrl());
+                                intent.putExtra(Flags.INTENT_TRACK_OGG, trndSwitcher.getCurrentTrack().getSecureOggUrl());
+                                startActivity(intent);
+                            }
+                        });
+
                         break;
 
                     case Flags.CALLBACK_FEATURE_RECENT:
                         recentTracks.addAll(body);
                         recentAdapter.notifyDataSetChanged();
-                        PeriodicLabelSwitcher rcntSwitcher = new PeriodicLabelSwitcher(
+                        final PeriodicLabelSwitcher rcntSwitcher = new PeriodicLabelSwitcher(
                                 R.id.recent_showcase_discography,
                                 rootView.findViewById(R.id.recent_showcase),
                                 body,
@@ -134,6 +161,19 @@ public class HomeFragment extends Fragment {
                         );
 
                         rcntSwitcher.start();
+                        ImageView recentShowcase = (ImageView) rootView.findViewById(R.id.recent_showcase_discography);
+                        recentShowcase.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Intent intent = new Intent(rootView.getContext(), PlayerActivity.class);
+                                intent.putExtra(Flags.INTENT_TRACK_ARTIST, rcntSwitcher.getCurrentTrack().getName());
+                                intent.putExtra(Flags.INTENT_TRACK_TITLE, rcntSwitcher.getCurrentTrack().getTitle());
+                                intent.putExtra(Flags.INTENT_TRACK_DISCOGRAPHY, rcntSwitcher.getCurrentTrack().getDiscographyUrl());
+                                intent.putExtra(Flags.INTENT_TRACK_OGG, rcntSwitcher.getCurrentTrack().getSecureOggUrl());
+                                startActivity(intent);
+                            }
+                        });
+
                         break;
                 }
 

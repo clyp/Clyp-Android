@@ -1,11 +1,13 @@
 package it.clyp.clyp.Activity;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -17,6 +19,7 @@ import it.clyp.clyp.API.ClypApi;
 import it.clyp.clyp.Flags;
 import it.clyp.clyp.R;
 import it.clyp.clyp.Ui.Fragment.QueueListDialogFragment;
+import it.clyp.clyp.Ui.Visualizer;
 import it.clyp.clyp.Util.CachedIconloader;
 import it.clyp.clyp.Util.GraphicOperation;
 
@@ -39,8 +42,13 @@ public class PlayerActivity extends AppCompatActivity implements QueueListDialog
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SurfaceView surface = (SurfaceView) findViewById(R.id.visualizer);
+        Visualizer viz = new Visualizer(getApplicationContext());
+
         setContentView(R.layout.activity_player);
         Bundle bundle = getIntent().getExtras();
+
+        final Context context = getApplicationContext();
 
         TextView artist = (TextView) findViewById(R.id.player_author);
         TextView title = (TextView) findViewById(R.id.player_title);
@@ -52,7 +60,18 @@ public class PlayerActivity extends AppCompatActivity implements QueueListDialog
                 bundle.getString(Flags.INTENT_TRACK_DISCOGRAPHY),
                 findViewById(R.id.player_ui),
                 R.id.player_discography,
-                null
+                new CachedIconloader.CILPostFetchCallback() {
+                    @Override
+                    public Bitmap onComplete(Bitmap bmp) {
+                        return new GraphicOperation(bmp)
+                                .scale(5f)
+                                .fastBlur(0.5f, 1)
+                                .sharpen(context, GraphicOperation.MEDIUM_SHARPEN)
+                                .fastBlur(0.80f, 1)
+                                .roundCorners(5)
+                                .result();
+                    }
+                }
         );
 
         CachedIconloader.setIcon(
@@ -63,8 +82,8 @@ public class PlayerActivity extends AppCompatActivity implements QueueListDialog
                     @Override
                     public Bitmap onComplete(Bitmap bmp) {
                         return new GraphicOperation(bmp)
-                                .fastblur(0.75f, 2)
-                                .tint(Color.argb(100, 0, 0, 0))
+                                .fastBlur(0.70f, 5)
+                                .tint(Color.argb(255, 225, 225, 225))
                                 .result();
                     }
                 }
@@ -80,6 +99,8 @@ public class PlayerActivity extends AppCompatActivity implements QueueListDialog
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
         // new AuthFragment().show(getSupportFragmentManager(), "Sign in");
         /*
         auth.setOnClickListener(new View.OnClickListener() {

@@ -1,8 +1,17 @@
-package it.clyp.clyp.API.Structure;
+package it.clyp.clyp.API.Response;
 
-import java.util.List;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+
+import java.util.List;
+
+import it.clyp.clyp.API.Structure.Paging;
+import it.clyp.clyp.API.Structure.User;
+
+/**
+ * Generated with: http://www.jsonschema2pojo.org/
+ * By lite20
+ */
 
 public class UploadsResponse {
 

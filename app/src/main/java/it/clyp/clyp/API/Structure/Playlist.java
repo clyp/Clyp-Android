@@ -3,7 +3,8 @@ package it.clyp.clyp.API.Structure;
 import java.util.List;
 
 /**
- * Created by lite20 on 7/17/2017.
+ * Generated with: http://www.jsonschema2pojo.org/
+ * By lite20
  */
 
 public class Playlist {

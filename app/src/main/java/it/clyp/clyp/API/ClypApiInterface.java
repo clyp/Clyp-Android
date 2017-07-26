@@ -4,9 +4,10 @@ import java.util.List;
 
 import it.clyp.clyp.API.Response.AuthResponse;
 import it.clyp.clyp.API.Response.CategoryResponse;
+import it.clyp.clyp.API.Response.UploadsResponse;
+import it.clyp.clyp.API.Structure.Notification;
 import it.clyp.clyp.API.Structure.Playlist;
 import it.clyp.clyp.API.Structure.Track;
-import it.clyp.clyp.API.Structure.UploadsResponse;
 import it.clyp.clyp.API.Structure.User;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -44,6 +45,22 @@ public interface ClypApiInterface {
     @GET("v2/me/uploads")
     Call<UploadsResponse> getUploads(
             @Header("Authorization") String auth_token
+    );
+
+    @GET("/notifications")
+    Call<List<Notification>> getNotifications(
+            @Header("Authorization") String auth_token
+    );
+
+    @GET("/notifications")
+    Call<List<Notification>> getSetofNotifications(
+            @Header("Authorization") String auth_token
+    );
+
+    @GET("/notifications/{noteid}/acknowledgement")
+    Call<List<Notification>> acknowledgeNotification(
+            @Header("Authorization") String auth_token,
+            @Path("noteid") String note_id
     );
 
     @GET("me")

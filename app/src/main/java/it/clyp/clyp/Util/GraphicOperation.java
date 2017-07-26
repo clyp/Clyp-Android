@@ -1,5 +1,6 @@
 package it.clyp.clyp.Util;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -11,6 +12,11 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicConvolve3x3;
+import android.util.Log;
 
 /**
  * Created by lite20 on 7/21/2017.
@@ -19,15 +25,18 @@ import android.graphics.RectF;
 public class GraphicOperation {
     private Bitmap bitmap;
 
+    public static final int LOW_SHARPEN = 0;
+    public static final int MEDIUM_SHARPEN = 1;
+    public static final int HIGH_SHARPEN = 2;
+
     public GraphicOperation(Bitmap bmp) {
         this.bitmap = bmp.copy(bmp.getConfig(), true);
     }
 
-    public GraphicOperation fastblur(float scale, int radius) {
+    public GraphicOperation fastBlur(float scale, int radius) {
         int width = Math.round(bitmap.getWidth() * scale);
         int height = Math.round(bitmap.getHeight() * scale);
         bitmap = Bitmap.createScaledBitmap(bitmap, width, height, false);
-
         if (radius < 1) {
            // return (null);
         }
@@ -89,10 +98,9 @@ public class GraphicOperation {
                     boutsum += sir[2];
                 }
             }
+
             stackpointer = radius;
-
             for (x = 0; x < w; x++) {
-
                 r[yi] = dv[rsum];
                 g[yi] = dv[gsum];
                 b[yi] = dv[bsum];
@@ -111,6 +119,7 @@ public class GraphicOperation {
                 if (y == 0) {
                     vmin[x] = Math.min(x + radius + 1, wm);
                 }
+
                 p = pix[yw + vmin[x]];
 
                 sir[0] = (p & 0xff0000) >> 16;
@@ -138,8 +147,10 @@ public class GraphicOperation {
 
                 yi++;
             }
+
             yw += w;
         }
+
         for (x = 0; x < w; x++) {
             rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
             yp = -radius * w;
@@ -172,6 +183,7 @@ public class GraphicOperation {
                     yp += w;
                 }
             }
+
             yi = x;
             stackpointer = radius;
             for (y = 0; y < h; y++) {
@@ -192,6 +204,7 @@ public class GraphicOperation {
                 if (x == 0) {
                     vmin[y] = Math.min(y + r1, hm) * w;
                 }
+
                 p = x + vmin[y];
 
                 sir[0] = r[p];
@@ -252,13 +265,90 @@ public class GraphicOperation {
         return this;
     }
 
+    /**
+     * This function tints the Bitmap with a certain color
+     * @param tint The color int to tint with. Should have 255 alpha, and RGB between 0 to 255 (higher = less impact)
+     * @return
+     */
     public GraphicOperation tint(int tint) {
-            Canvas canvas = new Canvas(bitmap);
-            Paint p = new Paint(Color.RED);
-            ColorFilter filter = new LightingColorFilter(tint, 0x00000000);    // darken
-            p.setColorFilter(filter);
-            canvas.drawBitmap(bitmap, new Matrix(), p);
-            return this;
+        Canvas canvas = new Canvas(bitmap);
+        Paint p = new Paint(Color.RED);
+        ColorFilter filter = new LightingColorFilter(tint, 0x00000000);
+        p.setColorFilter(filter);
+        canvas.drawBitmap(bitmap, new Matrix(), p);
+        return this;
+    }
+
+    public GraphicOperation scale(float scale) {
+        bitmap = Bitmap.createScaledBitmap(
+                bitmap,
+                (int)(bitmap.getWidth() * scale),
+                (int)(bitmap.getHeight() * scale),
+                false
+        );
+
+        return this;
+    }
+
+    /**
+     * Based off https://stackoverflow.com/questions/34175032/color-matrix-for-image-sharpening-in-android
+     * @param context
+     * @param radius
+     * @return
+     */
+    public GraphicOperation sharpen(Context context, float[] radius) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            Bitmap out = Bitmap.createBitmap(
+                    bitmap.getWidth(),
+                    bitmap.getHeight(),
+                    Bitmap.Config.ARGB_8888
+            );
+
+            RenderScript rs = RenderScript.create(context);
+
+            Allocation allocIn = Allocation.createFromBitmap(rs, bitmap);
+            Allocation allocOut = Allocation.createFromBitmap(rs, out);
+
+            ScriptIntrinsicConvolve3x3 convolution = ScriptIntrinsicConvolve3x3.create(rs, Element.U8_4(rs));
+            convolution.setInput(allocIn);
+            convolution.setCoefficients(radius);
+            convolution.forEach(allocOut);
+
+            allocOut.copyTo(bitmap);
+            rs.destroy();
+        } else {
+            Log.d("ClypGO", "API level too low to perform image sharpening.");
+        }
+
+        return this;
+    }
+
+    public GraphicOperation sharpen(Context context, int degree) {
+        switch(degree) {
+            case MEDIUM_SHARPEN:
+                sharpen(
+                        context,
+                        new float[]{0.0f, -1.0f, 0.0f, -1.0f, 5.0f, -1.0f, 0.0f, -1.0f, 0.0f}
+                );
+
+                break;
+            case HIGH_SHARPEN:
+                sharpen(
+                        context,
+                        new float[]{-0.60f, -0.60f, -0.60f, -0.60f, 5.81f, -0.60f, -0.60f, -0.60f, -0.60f}
+                );
+
+                break;
+            default:
+                sharpen(
+                        context,
+                        new float[]{ -0.15f, -0.15f, -0.15f, -0.15f, 2.2f, -0.15f, -0.15f, -0.15f, -0.15f}
+                );
+
+                break;
+        }
+
+        return this;
     }
 
     public Bitmap result() {

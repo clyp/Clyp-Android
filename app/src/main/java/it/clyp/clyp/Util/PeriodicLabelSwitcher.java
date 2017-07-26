@@ -19,6 +19,8 @@ public class PeriodicLabelSwitcher implements Runnable {
 
     private final List<String> urls;
 
+    private final List<Track> tracks;
+
     private final View rootView;
 
     private int offset = 0;
@@ -29,6 +31,7 @@ public class PeriodicLabelSwitcher implements Runnable {
         this.urls = TrackUtil.getDiscographyUrls(tracks);
         this.rootView = rootView;
         this.id = id;
+        this.tracks = tracks;
     }
 
     @Override
@@ -44,5 +47,16 @@ public class PeriodicLabelSwitcher implements Runnable {
 
     public void start() {
         handler.post(this);
+    }
+
+    public Track getCurrentTrack() {
+        // the value of offset is always 1 more than the current track
+        // so we have to hop back a track to get the current one
+        int prev = offset - 1;
+        if(offset < 0) {
+            offset = tracks.size() - 1;
+        }
+
+        return tracks.get(prev);
     }
 }
