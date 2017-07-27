@@ -37,7 +37,7 @@ public class PlayerActivity extends AppCompatActivity implements QueueListDialog
 
     private ClypApi api;
 
-    private MediaPlayer mediaPlayer;
+    private static MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,16 +90,25 @@ public class PlayerActivity extends AppCompatActivity implements QueueListDialog
         );
 
         try {
+            if(mediaPlayer != null) {
+                mediaPlayer.stop();
+            }
+
             mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(bundle.getString(Flags.INTENT_TRACK_OGG));
             mediaPlayer.prepare();
             mediaPlayer.start();
-            ImageView play = (ImageView) findViewById(R.id.player_play);
+            final ImageView play = (ImageView) findViewById(R.id.player_play);
             play.setImageResource(R.drawable.ic_pause_circle_filled_black_24dp);
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    play.setImageResource(R.drawable.ic_play_circle_filled_black_24dp);
+                }
+            });
         } catch (IOException e) {
             e.printStackTrace();
         }
-
 
         // new AuthFragment().show(getSupportFragmentManager(), "Sign in");
         /*

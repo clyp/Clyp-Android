@@ -20,6 +20,35 @@ public class CachedIconloader {
 
     private static HashMap<String, Bitmap> bitmapCache = new HashMap<String, Bitmap>();
 
+    public static void fetchIcon(String url, final CILPostFetchCallback cb) {
+        if (bitmapCache.containsKey(url)) {
+            cb.onComplete(bitmapCache.get(url));
+            return;
+        } else {
+            // if we haven't loaded the image before, we grab it
+            final String finalUrl = url;
+            final ImageRequest request = new ImageRequest(url,
+                    new Response.Listener<Bitmap>() {
+                        @Override
+                        public void onResponse(Bitmap bitmap) {
+                            // place the image in cache
+                            // TODO use filesystem based cache
+                            bitmapCache.put(finalUrl, bitmap);
+                            cb.onComplete(bitmap);
+                        }
+                    }, 0, 0, null,
+                    new Response.ErrorListener() {
+                        public void onErrorResponse(VolleyError error) {
+                            // TODO show failed load icon and warning to user
+                            // TODO check if internet is still available
+                        }
+                    }
+            );
+
+            HomeActivity.mRequestQueue.add(request);
+        }
+    }
+
     public static void setIcon(String url, final View parentView, final int id, final CILPostFetchCallback cb) {
         // check if the image has been loaded before and use a cached image if available
         if (bitmapCache.containsKey(url)) {

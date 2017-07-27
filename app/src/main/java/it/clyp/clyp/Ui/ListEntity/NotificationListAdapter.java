@@ -11,82 +11,77 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.HashMap;
 import java.util.List;
 
-import it.clyp.clyp.API.Structure.Track;
+import it.clyp.clyp.API.Structure.Notification;
 import it.clyp.clyp.R;
 import it.clyp.clyp.Util.CachedIconloader;
 import it.clyp.clyp.Util.GraphicOperation;
 
 /**
- * Created by lite20 on 7/17/2017.
+ * Created by lite20 on 7/26/2017.
  */
 
-public class HomeListAdapter extends ArrayAdapter<Track> {
-    private List<Track> tracks;
+public class NotificationListAdapter extends ArrayAdapter<Notification> {
+    private final Context context;
 
-    private HashMap<String, Integer> urlToIdMap = new HashMap<String, Integer>();
+    private final List<Notification> notificationList;
 
-    private Context context;
-
-    public HomeListAdapter(Context context, int resourceId, List<Track> items) {
+    public NotificationListAdapter(Context context, int resourceId, List<Notification> items) {
         super(context, resourceId, items);
         this.context = context;
-        this.tracks = items;
+        this.notificationList = items;
     }
 
     /* private view holder class */
     private class ViewHolder {
-        ImageView trackDiscography;
-        TextView trackTitle;
-        TextView trackArtist;
+        ImageView notificationImage;
+        TextView notificationText;
+        TextView notificationTime;
     }
 
     /**
-     * 
+     *
      * @param listPosition
      * @param listViewElement This is one singular l
      * @param parent
      * @return
      */
     public View getView(int listPosition, View listViewElement, ViewGroup parent) {
-        ViewHolder holder;
-        Track track = getItem(listPosition);
+        NotificationListAdapter.ViewHolder holder;
+        Notification notification = getItem(listPosition);
         LayoutInflater mInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
         if (listViewElement == null) {
             listViewElement = mInflater.inflate(R.layout.track_item, null);
-            holder = new ViewHolder();
+            holder = new NotificationListAdapter.ViewHolder();
             // fetch references to all elements
-            holder.trackTitle = (TextView) listViewElement.findViewById(R.id.track_title);
-            holder.trackArtist = (TextView) listViewElement.findViewById(R.id.track_artist);
-            holder.trackDiscography = (ImageView) listViewElement.findViewById(R.id.track_discography);
+            holder.notificationText = (TextView) listViewElement.findViewById(R.id.notification_text);
+            holder.notificationTime = (TextView) listViewElement.findViewById(R.id.notification_time);
+            holder.notificationImage = (ImageView) listViewElement.findViewById(R.id.notification_image);
             listViewElement.setTag(holder);
         } else {
-            holder = (ViewHolder) listViewElement.getTag();
+            holder = (NotificationListAdapter.ViewHolder) listViewElement.getTag();
         }
 
-        /* set title to track's title */
-        holder.trackTitle.setText(track.getTitle());
+        /* set notification text */
+        holder.notificationText.setText(notification.getText());
 
-        /* set track artist */
-        // not all tracks are uploaded with an account so we only set the author if a user is tied to the track
-        if(track.getUser() != null) {
-            holder.trackArtist.setText(track.getName());
-        }
+        /* set notification time */
+        holder.notificationTime.setText(notification.getDateCreated());
 
-        /* set track discography (artwork) */
+        /* set notification image */
         // make a final fork of the convert view since we need this specific copy for getting the ui image element
         final View finalConvertView = listViewElement;
 
         // set a place holder image until loaded
-        holder.trackDiscography.setImageBitmap(
+        holder.notificationImage.setImageBitmap(
                 BitmapFactory.decodeResource(context.getResources(), R.drawable.blank)
         );
-        // load the icon in the background and set it once it's available
+        // load the image in the background and set it once it's available
         CachedIconloader.setIcon(
-                track.getDiscographyUrl(),
-                listViewElement, R.id.track_discography,
+                notification.getImageUrl(),
+                listViewElement,
+                R.id.notification_image,
                 new CachedIconloader.CILPostFetchCallback() {
                     @Override
                     public Bitmap onComplete(Bitmap bmp) {

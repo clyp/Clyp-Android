@@ -113,12 +113,16 @@ public class HomeFragment extends Fragment {
                         featuredShowcase.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Intent intent = new Intent(rootView.getContext(), PlayerActivity.class);
-                                intent.putExtra(Flags.INTENT_TRACK_ARTIST, ftSwitcher.getCurrentTrack().getName());
-                                intent.putExtra(Flags.INTENT_TRACK_TITLE, ftSwitcher.getCurrentTrack().getTitle());
-                                intent.putExtra(Flags.INTENT_TRACK_DISCOGRAPHY, ftSwitcher.getCurrentTrack().getDiscographyUrl());
-                                intent.putExtra(Flags.INTENT_TRACK_OGG, ftSwitcher.getCurrentTrack().getSecureOggUrl());
-                                startActivity(intent);
+                                if(ftSwitcher.getCurrentTrack() != null) {
+                                    Intent intent = new Intent(rootView.getContext(), PlayerActivity.class);
+                                    intent.putExtra(Flags.INTENT_TRACK_ARTIST, ftSwitcher.getCurrentTrack().getName());
+                                    intent.putExtra(Flags.INTENT_TRACK_TITLE, ftSwitcher.getCurrentTrack().getTitle());
+                                    intent.putExtra(Flags.INTENT_TRACK_DISCOGRAPHY, ftSwitcher.getCurrentTrack().getDiscographyUrl());
+                                    intent.putExtra(Flags.INTENT_TRACK_OGG, ftSwitcher.getCurrentTrack().getSecureOggUrl());
+                                    startActivity(intent);
+                                } else {
+                                    // TODO investigate if error has occurred
+                                }
                             }
                         });
 
@@ -139,12 +143,16 @@ public class HomeFragment extends Fragment {
                         trndShowcase.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Intent intent = new Intent(rootView.getContext(), PlayerActivity.class);
-                                intent.putExtra(Flags.INTENT_TRACK_ARTIST, trndSwitcher.getCurrentTrack().getName());
-                                intent.putExtra(Flags.INTENT_TRACK_TITLE, trndSwitcher.getCurrentTrack().getTitle());
-                                intent.putExtra(Flags.INTENT_TRACK_DISCOGRAPHY, trndSwitcher.getCurrentTrack().getDiscographyUrl());
-                                intent.putExtra(Flags.INTENT_TRACK_OGG, trndSwitcher.getCurrentTrack().getSecureOggUrl());
-                                startActivity(intent);
+                                if(trndSwitcher.getCurrentTrack() !=  null) {
+                                    Intent intent = new Intent(rootView.getContext(), PlayerActivity.class);
+                                    intent.putExtra(Flags.INTENT_TRACK_ARTIST, trndSwitcher.getCurrentTrack().getName());
+                                    intent.putExtra(Flags.INTENT_TRACK_TITLE, trndSwitcher.getCurrentTrack().getTitle());
+                                    intent.putExtra(Flags.INTENT_TRACK_DISCOGRAPHY, trndSwitcher.getCurrentTrack().getDiscographyUrl());
+                                    intent.putExtra(Flags.INTENT_TRACK_OGG, trndSwitcher.getCurrentTrack().getSecureOggUrl());
+                                    startActivity(intent);
+                                } else {
+                                    // TODO investigate if error has occurred
+                                }
                             }
                         });
 
@@ -165,12 +173,16 @@ public class HomeFragment extends Fragment {
                         recentShowcase.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                Intent intent = new Intent(rootView.getContext(), PlayerActivity.class);
-                                intent.putExtra(Flags.INTENT_TRACK_ARTIST, rcntSwitcher.getCurrentTrack().getName());
-                                intent.putExtra(Flags.INTENT_TRACK_TITLE, rcntSwitcher.getCurrentTrack().getTitle());
-                                intent.putExtra(Flags.INTENT_TRACK_DISCOGRAPHY, rcntSwitcher.getCurrentTrack().getDiscographyUrl());
-                                intent.putExtra(Flags.INTENT_TRACK_OGG, rcntSwitcher.getCurrentTrack().getSecureOggUrl());
-                                startActivity(intent);
+                                if(rcntSwitcher.getCurrentTrack() != null) {
+                                    Intent intent = new Intent(rootView.getContext(), PlayerActivity.class);
+                                    intent.putExtra(Flags.INTENT_TRACK_ARTIST, rcntSwitcher.getCurrentTrack().getName());
+                                    intent.putExtra(Flags.INTENT_TRACK_TITLE, rcntSwitcher.getCurrentTrack().getTitle());
+                                    intent.putExtra(Flags.INTENT_TRACK_DISCOGRAPHY, rcntSwitcher.getCurrentTrack().getDiscographyUrl());
+                                    intent.putExtra(Flags.INTENT_TRACK_OGG, rcntSwitcher.getCurrentTrack().getSecureOggUrl());
+                                    startActivity(intent);
+                                } else {
+                                    // TODO investigate it error has occurred
+                                }
                             }
                         });
 

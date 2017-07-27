@@ -4,6 +4,7 @@ import java.util.List;
 
 import it.clyp.clyp.API.Response.AuthResponse;
 import it.clyp.clyp.API.Response.CategoryResponse;
+import it.clyp.clyp.API.Response.NotificationResponse;
 import it.clyp.clyp.API.Response.UploadsResponse;
 import it.clyp.clyp.API.Structure.Notification;
 import it.clyp.clyp.API.Structure.Playlist;
@@ -48,12 +49,12 @@ public interface ClypApiInterface {
     );
 
     @GET("/notifications")
-    Call<List<Notification>> getNotifications(
+    Call<NotificationResponse> getNotifications(
             @Header("Authorization") String auth_token
     );
 
     @GET("/notifications")
-    Call<List<Notification>> getSetofNotifications(
+    Call<NotificationResponse> getSetofNotifications(
             @Header("Authorization") String auth_token
     );
 

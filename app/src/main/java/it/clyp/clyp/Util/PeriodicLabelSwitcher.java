@@ -50,13 +50,18 @@ public class PeriodicLabelSwitcher implements Runnable {
     }
 
     public Track getCurrentTrack() {
-        // the value of offset is always 1 more than the current track
-        // so we have to hop back a track to get the current one
-        int prev = offset - 1;
-        if(offset < 0) {
-            offset = tracks.size() - 1;
-        }
+        if(tracks.size() > 0) {
+            // the value of offset is always 1 more than the current track
+            // so we have to hop back a track to get the current one
+            int prev = offset - 1;
+            if (offset < 0) {
+                offset = tracks.size() - 1;
+            }
 
-        return tracks.get(prev);
+
+            return tracks.get(prev);
+        } else {
+            return null;
+        }
     }
 }

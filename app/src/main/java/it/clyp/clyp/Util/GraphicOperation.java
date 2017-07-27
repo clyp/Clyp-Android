@@ -301,7 +301,7 @@ public class GraphicOperation {
             Bitmap out = Bitmap.createBitmap(
                     bitmap.getWidth(),
                     bitmap.getHeight(),
-                    Bitmap.Config.ARGB_8888
+                    bitmap.getConfig()
             );
 
             RenderScript rs = RenderScript.create(context);

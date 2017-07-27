@@ -13,6 +13,7 @@ import it.clyp.clyp.API.Callback.AuthCallback;
 import it.clyp.clyp.API.Callback.FeatureCallback;
 import it.clyp.clyp.API.Callback.StandardCallback;
 import it.clyp.clyp.API.Response.AuthResponse;
+import it.clyp.clyp.API.Response.NotificationResponse;
 import it.clyp.clyp.API.Structure.Track;
 import it.clyp.clyp.API.Structure.User;
 import it.clyp.clyp.Flags;
@@ -241,6 +242,50 @@ public class ClypApi implements Runnable, Callback<AuthResponse> {
                 cb.onComplete(t.getMessage(), null);
             }
         });
+    }
+
+    public void getNotifications(final StandardCallback cb) {
+        Call<NotificationResponse> call = service.getNotifications(
+                "Bearer " + token
+        );
+
+        Callback<NotificationResponse> callback = new Callback<NotificationResponse>() {
+
+            public boolean tried = false;
+
+            @Override
+            public void onResponse(Call<NotificationResponse> call, Response<NotificationResponse> response) {
+                if (response.isSuccessful()) {
+                    cb.onComplete(null, response.body());
+                } else {
+                    // error response, no access to resource?
+                    try {
+                        Log.d("ClypAPI", "ERROR: " + response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    try {
+                        if(response.message().contains("Unauthorized") && !tried) {
+                            tried = true;
+                            pendingCalls.add(CallbackBuilder.construct(call, this));
+                            refreshToken();
+                        } else {
+                            cb.onComplete(response.errorBody().string(), null);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<NotificationResponse> call, Throwable t) {
+                // something went completely south (like no internet connection)
+                Log.d("ClypAPI", "FAILURE: " + t.getMessage());
+                cb.onComplete(t.getMessage(), null);
+            }
+        };
     }
 
     public void getUploads(final StandardCallback cb) {
