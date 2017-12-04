@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Clyp</string>
+    <string name="app_name">PaperClyp</string>
     <string name="title_activity_home">HomeActivity</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
@@ -8,4 +8,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="signin">Sign In</string>
     <string name="cancel">Cancel</string>
+    <string name="facebook_app_id">376586796124711</string>
+    <string name="fb_login_protocol_scheme">fb376586796124711</string>
 </resources>

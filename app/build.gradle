@@ -19,7 +19,7 @@ android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
-        applicationId "it.clyp.clyp"
+        applicationId "info.gfruit.paperclyp"
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 3
@@ -55,6 +55,7 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:10.0.1'
     compile 'com.google.firebase:firebase-invites:10.0.1'
     compile 'com.google.firebase:firebase-core:10.0.1'
+    compile 'com.facebook.android:facebook-android-sdk:[4,5)'
     compile 'com.github.claucookie.miniequalizer:library:1.0.0'
     testCompile 'junit:junit:4.12'
     compile('com.crashlytics.sdk.android:crashlytics:2.6.8@aar') {

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="it.clyp.clyp.Activity.PlayerActivity">
+    tools:context="info.gfruit.paperclyp.Activity.PlayerActivity">
 
     <FrameLayout
         android:layout_width="match_parent"
