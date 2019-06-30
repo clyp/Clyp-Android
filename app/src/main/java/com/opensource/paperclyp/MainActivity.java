@@ -1,18 +1,26 @@
 package com.opensource.paperclyp;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import android.util.Log;
 
-import android.view.View;
-
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.view.GravityCompat;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 
 import android.view.MenuItem;
 
 import com.google.android.material.navigation.NavigationView;
+import com.opensource.paperclyp.Util.GraphicOperation.Blur;
+import com.opensource.paperclyp.Util.GraphicOperation.Sharpen;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import androidx.drawerlayout.widget.DrawerLayout;
 
@@ -20,6 +28,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.view.Menu;
+import android.view.ViewTreeObserver;
+import android.widget.ImageView;
+
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -30,14 +42,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -45,6 +49,60 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+
+
+        // check if opened from link
+        Intent intent = getIntent();
+        Uri uri = this.getIntent().getData();
+        try {
+            // get ID
+            URL url = new URL(uri.getScheme(), uri.getHost(), uri.getPath());
+            String url_text = url.toString();
+            String id = url_text.split("/")[3];
+
+            // set main artwork
+            final ImageView discography = (ImageView) findViewById(R.id.playback_discography);
+            ViewTreeObserver vto = discography.getViewTreeObserver();
+            vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+                public boolean onPreDraw() {
+                    discography.getViewTreeObserver().removeOnPreDrawListener(this);
+                    int width = discography.getMeasuredWidth();
+                    Log.i("PaperClyp", "Width: " + width);
+                    Picasso.get()
+                        .load("https://static.clyp.it/user-content/audio-file-artwork/42cfe010e83e478286218b74d3cea78b.jpg")
+                        .resize(width, width)
+                        .into(discography);
+
+                    return true;
+                }
+            });
+
+            // load background artwork
+            Target backgroundTarget = new Target() {
+                @Override
+                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                    ConstraintLayout playbackPanel = (ConstraintLayout) findViewById(R.id.background_panel);
+                    playbackPanel.setBackground(new BitmapDrawable(getResources(), bitmap));
+                }
+
+                @Override
+                public void onBitmapFailed(Exception e, Drawable errorDrawable) {}
+
+                @Override
+                public void onPrepareLoad(Drawable placeHolderDrawable) {}
+            };
+
+            Picasso.get()
+                    .load("https://static.clyp.it/user-content/audio-file-artwork/42cfe010e83e478286218b74d3cea78b.jpg")
+                    .transform(new Blur(20))
+                    .into(backgroundTarget);
+
+            // expand playback panel
+            SlidingUpPanelLayout slidingPanel = (SlidingUpPanelLayout) findViewById(R.id.playback_panel);
+            slidingPanel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+
+            Log.i("PaperClyp", "Loaded song from URL ID: " + id);
+        } catch (Exception e) { /* do nothing */ }
     }
 
     @Override
